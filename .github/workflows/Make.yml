@@ -44,7 +44,7 @@ jobs:
           root-reserve-mb: 512
           swap-size-mb: 1024
           remove-dotnet: 'true'
-          
+
     - name: Check Out
       uses: actions/checkout@main
       
@@ -89,6 +89,7 @@ jobs:
         cd workspace
         repo sync -j$(nproc --all) -f --force-sync
         ls -al
+        rm -rf .repo
       
     - name: Clone device
       run: |
