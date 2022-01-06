@@ -99,7 +99,7 @@ jobs:
         cd ${{ github.event.inputs.DEVICE_PATH }}
         sed -i 's/twrp/omni/g' twrp_nabu.mk
         sed -i 's/twrp/omni/g' AndroidProducts.mk
-        mv twrp_vince.mk omni_vince.mk
+        mv twrp_nabu.mk omni_nabu.mk
 
     - name: Building
       run: |
