@@ -6,15 +6,15 @@ on:
       LIBRARY_NAME:
         description: 'LIBRARY_NAME'
         required: true
-        default: 'twrp'
+        default: 'omni'
       LIBRARY_URL:
         description: 'LIBRARY_URL'
         required: true
-        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git'
+        default: 'git://github.com/PitchBlackRecoveryProject/manifest_pb.git'
       LIBRARY_BRANCH:
         description: 'LIBRARY_BRANCH'
         required: true
-        default: 'twrp-11'
+        default: 'android-11.0'
       DEVICE_URL:
         description: 'DEVICE_URL'
         required: true
@@ -96,6 +96,10 @@ jobs:
         PATH=~/bin:$PATH
         cd ${{ steps.pwd.outputs.pwd }}
         git clone ${{ github.event.inputs.DEVICE_URL }} -b ${{ github.event.inputs.DEVICE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
+        cd ${{ github.event.inputs.DEVICE_PATH }}
+        sed -i 's/twrp/omni/g' twrp_nabu.mk
+        sed -i 's/twrp/omni/g' AndroidProducts.mk
+        mv twrp_vince.mk omni_vince.mk
 
     - name: Building
       run: |
@@ -105,8 +109,14 @@ jobs:
         source build/envsetup.sh
         lunch ${{ github.event.inputs.LIBRARY_NAME }}_${{ github.event.inputs.DEVICE_NAME }}-eng 
         make clean
-        make recoveryimage -j$(nproc --all)        
-      
+        make pbrp -j2
+
+    - name: Upload build result
+      uses: actions/upload-artifact@v2
+      with:
+        name: recovery.zip
+        path: workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery.img
+
     - name: Upload to Release
       uses: softprops/action-gh-release@v1
       with:
